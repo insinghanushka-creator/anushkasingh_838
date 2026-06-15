@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Book Store</title>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            margin: 0;
+            text-align: center;
+        }
+
+        h2 {
+            color: white;
+            margin-top: 20px;
+        }
+
+        .container {
+            width: 80%;
+            margin: 30px auto;
+            padding: 20px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #333;
+            color: white;
+        }
+        table cell()
+        
+        th, td {
+            padding: 12px;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        tr:hover {
+            background: #e6e6ff;
+        }
+
+        input[type="number"] {
+            width: 60px;
+            padding: 6px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+
+        input[type="checkbox"] {
+            transform: scale(1.3);
+            cursor: pointer;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            color: white;
+            cursor: pointer;
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+        }
+
+        #output {
+            margin-top: 20px;
+            padding: 20px;
+            display: inline-block;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            text-align: left;
+        }
+
+        .selected {
+            background: #d1d1ff !important;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>📚 Online Book Store</h2>
+
+<div class="container">
+
+<form>
+<table id="bookTable">
+
+<tr>
+    <th>Code</th>
+    <th>Book</th>
+    <th>Price ₹</th>
+    <th>Select</th>
+    <th>Qty</th>
+</tr>
+
+<tr>
+    <td>BC1</td>
+    <td>Biography Of Arun Gandhi</td>
+    <td>270</td>
+    <td><input type="checkbox" onclick="toggleQty(this)"></td>
+    <td><input type="number" disabled></td>
+</tr>
+
+<tr>
+    <td>BC2</td>
+    <td>Harry Potter</td>
+    <td>100</td>
+    <td><input type="checkbox" onclick="toggleQty(this)"></td>
+    <td><input type="number" disabled></td>
+</tr>
+
+<tr>
+    <td>BC3</td>
+    <td>Discovery Of India</td>
+    <td>150</td>
+    <td><input type="checkbox" onclick="toggleQty(this)"></td>
+    <td><input type="number" disabled></td>
+</tr>
+
+<tr>
+    <td>BC4</td>
+    <td>All Love Story</td>
+    <td>250</td>
+    <td><input type="checkbox" onclick="toggleQty(this)"></td>
+    <td><input type="number" disabled></td>
+</tr>
+
+<tr>
+    <td>BC5</td>
+    <td>Ancient Buddhism</td>
+    <td>500</td>
+    <td><input type="checkbox" onclick="toggleQty(this)"></td>
+    <td><input type="number" disabled></td>
+</tr>
+
+</table>
+
+<button type="button" onclick="showBill()">Show My Bill</button>
+
+<div id="output"></div>
+
+</form>
+
+</div>
+
+<script>
+
+// Enable/Disable Quantity
+function toggleQty(checkbox) {
+    let row = checkbox.parentElement.parentElement;
+    let qtyInput = row.cells[4].children[0];
+
+    if (checkbox.checked) {
+        qtyInput.disabled = false;
+        qtyInput.focus();
+        row.classList.add("selected");
+    } else {
+        qtyInput.disabled = true;
+        qtyInput.value = "";
+        row.classList.remove("selected");
+    }
+}
+
+// Calculate Bill
+function showBill() {
+    let table = document.getElementById("bookTable");
+    let total = 0;
+    let result = "<h3>Your Bill:</h3>";
+
+    for (let i = 1; i < table.rows.length; i++) {
+        let row = table.rows[i];
+
+        let name = row.cells[1].innerText;
+        let price = parseInt(row.cells[2].innerText);
+        let checkbox = row.cells[3].children[0];
+        let qty = row.cells[4].children[0].value;
+
+        if (checkbox.checked && qty > 0) {
+            let amount = price * qty;
+            total += amount;
+            result += name + " × " + qty + " = ₹" + amount + "<br>";
+        }
+    }
+
+    result += "<br><b>Total = ₹" + total + "</b>";
+    document.getElementById("output").innerHTML = result;
+}
+
+</script>
+
+</body>
+</html>
