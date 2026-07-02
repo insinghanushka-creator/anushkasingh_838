@@ -14,4 +14,8 @@ let num = parseInt(prompt("Enter a number: "));
 console.log("Factorial of " + num + " is: " + factorialIterative(num));
 arr at[0]+ an at(-1)
 let an =process <i class="slice
-ngrycreative    "></i>
+ngrycreative    "></i>nhd>guutr>
+git add
+git init
+git commit =m
+<retctrebly > 
