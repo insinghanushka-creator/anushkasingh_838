@@ -1,11 +1,12 @@
 package com.retailmax.retailmaxcrm.controller;
 
-import com.retailmax.retailmaxcrm.service.DashboardService;
 import java.util.Map;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.retailmax.retailmaxcrm.service.DashboardService;
 @RestController
 @RequestMapping("/api/dashboard")
 public class DashboardController {
