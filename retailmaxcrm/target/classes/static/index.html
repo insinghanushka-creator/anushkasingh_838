@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RetailMax CRM</title>
+<style>
+:root{
+  --ink:#16252e; --muted:#5d6e78; --line:#d9e0e5; --paper:#f4f6f8; --card:#ffffff;
+  --accent:#17607a; --accent-ink:#ffffff; --warn:#b4440c; --ok:#17704a;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --ink:#e6eef2; --muted:#94a7b2; --line:#2b3b45; --paper:#0f1a20; --card:#16252e;
+         --accent:#4fb3d1; --accent-ink:#06222c; --warn:#f08a4b; --ok:#5fcf9b; }
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font:15px/1.5 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--paper);color:var(--ink);display:flex;min-height:100vh}
+nav{width:210px;flex:none;background:var(--card);border-right:1px solid var(--line);padding:22px 14px;display:flex;flex-direction:column;gap:4px}
+nav h1{font:700 19px/1.2 Georgia,"Times New Roman",serif;margin:0 8px 18px;letter-spacing:.2px}
+nav h1 span{color:var(--accent)}
+nav button{all:unset;cursor:pointer;padding:9px 12px;border-radius:8px;color:var(--muted);font-weight:600}
+nav button:hover{background:var(--paper);color:var(--ink)}
+nav button.on{background:var(--accent);color:var(--accent-ink)}
+nav button:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+main{flex:1;padding:28px 32px;min-width:0}
+h2{margin:0 0 18px;font:700 24px/1.2 Georgia,"Times New Roman",serif}
+.bar{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.bar input[type=search]{flex:1;min-width:180px}
+input,select{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
+.btn{font:inherit;font-weight:600;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:8px;padding:8px 14px;cursor:pointer;white-space:nowrap}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.danger{background:transparent;color:var(--warn);border-color:var(--warn)}
+.btn.sm{padding:4px 10px;font-size:13px}
+.tablewrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;color:var(--muted);font-weight:600}
+tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+td.act{white-space:nowrap;text-align:right}
+td.act .btn{margin-left:4px}
+.empty{padding:26px;text-align:center;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.stat b{display:block;font:700 28px/1.2 Georgia,serif;font-variant-numeric:tabular-nums}
+.stat small{color:var(--muted)}
+.stat.alert b{color:var(--warn)}
+.tag{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600;border:1px solid var(--line);color:var(--muted)}
+.tag.PLACED{color:var(--accent);border-color:var(--accent)}
+.tag.DELIVERED{color:var(--ok);border-color:var(--ok)}
+.tag.CANCELLED{color:var(--warn);border-color:var(--warn)}
+.low{color:var(--warn);font-weight:700}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);padding:22px;width:min(480px,94vw)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog h3{margin:0 0 14px;font:700 19px Georgia,serif}
+label{display:block;font-size:13px;color:var(--muted);margin:10px 0 3px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.line{display:grid;grid-template-columns:1fr 80px 32px;gap:8px;margin-top:8px}
+.foot{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;align-items:center}
+.foot .tot{margin-right:auto;font-weight:700}
+#toast{position:fixed;right:18px;bottom:18px;background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .2s;max-width:80vw}
+#toast.show{opacity:1}
+.items{margin:0;padding-left:16px;color:var(--muted);font-size:13px}
+@media (max-width:760px){
+  body{flex-direction:column}
+  nav{width:100%;flex-direction:row;overflow-x:auto;padding:10px;border-right:0;border-bottom:1px solid var(--line)}
+  nav h1{margin:0 10px 0 4px;align-self:center;white-space:nowrap}
+  main{padding:18px 14px}
+}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}}
+</style>
+</head>
+<body>
+<nav>
+  <h1>Retail<span>Max</span> CRM</h1>
+  <button data-view="dashboard" class="on">Dashboard</button>
+  <button data-view="customers">Customers</button>
+  <button data-view="products">Products</button>
+  <button data-view="orders">Orders</button>
+</nav>
+<main id="main"></main>
+<dialog id="dlg"></dialog>
+<div id="toast" role="status"></div>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = n => '₹' + Number(n || 0).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const fdate = s => s ? new Date(s).toLocaleString('en-IN', {dateStyle: 'medium', timeStyle: 'short'}) : '';
+const LOW = 10;
+
+async function api(path, opts = {}) {
+  const res = await fetch('/api' + path, {
+    headers: {'Content-Type': 'application/json'}, ...opts,
+    body: opts.body ? JSON.stringify(opts.body) : undefined
+  });
+  if (res.status === 204) return null;
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Request failed (' + res.status + ')');
+  return data;
+}
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 3200);
+}
+async function safe(fn) { try { await fn(); } catch (e) { toast(e.message); } }
+
+/* ---------- navigation ---------- */
+let view = 'dashboard';
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  view = b.dataset.view;
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
+  render();
+});
+function render() { safe(() => ({dashboard, customers, products, orders})[view]()); }
+
+/* ---------- dialog helper ---------- */
+function openDialog(html) { const d = $('#dlg'); d.innerHTML = html; d.showModal(); return d; }
+function closeDialog() { $('#dlg').close(); }
+
+/* ---------- dashboard ---------- */
+async function dashboard() {
+  const s = await api('/dashboard');
+  $('#main').innerHTML = `<h2>Dashboard</h2>
+  <div class="stats">
+    <div class="stat"><b>${s.customers}</b><small>Customers</small></div>
+    <div class="stat"><b>${s.products}</b><small>Products</small></div>
+    <div class="stat"><b>${s.orders}</b><small>Orders</small></div>
+    <div class="stat"><b>${money(s.revenue)}</b><small>Revenue (excluding cancelled)</small></div>
+    <div class="stat ${s.lowStock ? 'alert' : ''}"><b>${s.lowStock}</b><small>Products with stock below ${LOW}</small></div>
+  </div>`;
+}
+
+/* ---------- generic list page ---------- */
+function listPage(title, key, cols, rows, onAdd) {
+  $('#main').innerHTML = `<h2>${title}</h2>
+  <div class="bar"><input type="search" id="q" placeholder="Search…" aria-label="Search" value="${esc(listPage.q || '')}">
+  <button class="btn" id="add">Add ${key}</button></div>
+  <div class="tablewrap">${rows.length ? `<table><thead><tr>${cols.map(c => `<th class="${c.num ? 'num' : ''}">${c.h}</th>`).join('')}<th></th></tr></thead>
+  <tbody>${rows.join('')}</tbody></table>` : '<div class="empty">Nothing here yet.</div>'}</div>`;
+  $('#add').onclick = onAdd;
+  const q = $('#q'); q.onkeydown = e => { if (e.key === 'Enter') { listPage.q = q.value; render(); } };
+}
+
+/* ---------- customers ---------- */
+async function customers() {
+  const list = await api('/customers' + (listPage.q ? '?q=' + encodeURIComponent(listPage.q) : ''));
+  window._customers = list;
+  listPage('Customers', 'customer',
+    [{h: 'Name'}, {h: 'Email'}, {h: 'Phone'}, {h: 'City'}, {h: 'Segment'}],
+    list.map(c => `<tr><td>${esc(c.name)}</td><td>${esc(c.email)}</td><td>${esc(c.phone)}</td><td>${esc(c.city)}</td>
+      <td><span class="tag">${esc(c.segment)}</span></td>
+      <td class="act"><button class="btn ghost sm" onclick="customerForm(${c.id})">Edit</button>
+      <button class="btn danger sm" onclick="delCustomer(${c.id})">Delete</button></td></tr>`),
+    () => customerForm());
+}
+function customerForm(id) {
+  const c = (window._customers || []).find(x => x.id === id) || {segment: 'Regular'};
+  const d = openDialog(`<h3>${id ? 'Edit' : 'New'} customer</h3>
+    <label>Name</label><input id="f_name" value="${esc(c.name)}">
+    <div class="row2"><div><label>Email</label><input id="f_email" type="email" value="${esc(c.email)}"></div>
+    <div><label>Phone</label><input id="f_phone" value="${esc(c.phone)}"></div></div>
+    <div class="row2"><div><label>City</label><input id="f_city" value="${esc(c.city)}"></div>
+    <div><label>Segment</label><select id="f_seg">${['Regular', 'Premium', 'VIP'].map(s => `<option ${s === c.segment ? 'selected' : ''}>${s}</option>`).join('')}</select></div></div>
+    <div class="foot"><button class="btn ghost" id="cx">Cancel</button><button class="btn" id="ok">Save</button></div>`);
+  $('#cx', d).onclick = closeDialog;
+  $('#ok', d).onclick = () => safe(async () => {
+    const body = {name: $('#f_name').value.trim(), email: $('#f_email').value.trim(), phone: $('#f_phone').value.trim(),
+                  city: $('#f_city').value.trim(), segment: $('#f_seg').value};
+    await api(id ? '/customers/' + id : '/customers', {method: id ? 'PUT' : 'POST', body});
+    closeDialog(); toast('Customer saved'); customers();
+  });
+}
+function delCustomer(id) {
+  if (!confirm('Delete this customer?')) return;
+  safe(async () => { await api('/customers/' + id, {method: 'DELETE'}); toast('Customer deleted'); customers(); });
+}
+
+/* ---------- products ---------- */
+async function products() {
+  const list = await api('/products' + (listPage.q ? '?q=' + encodeURIComponent(listPage.q) : ''));
+  window._products = list;
+  listPage('Products', 'product',
+    [{h: 'Name'}, {h: 'SKU'}, {h: 'Category'}, {h: 'Price', num: 1}, {h: 'Stock', num: 1}],
+    list.map(p => `<tr><td>${esc(p.name)}</td><td>${esc(p.sku)}</td><td>${esc(p.category)}</td>
+      <td class="num">${money(p.price)}</td><td class="num ${p.stock < LOW ? 'low' : ''}">${p.stock}</td>
+      <td class="act"><button class="btn ghost sm" onclick="productForm(${p.id})">Edit</button>
+      <button class="btn danger sm" onclick="delProduct(${p.id})">Delete</button></td></tr>`),
+    () => productForm());
+}
+function productForm(id) {
+  const p = (window._products || []).find(x => x.id === id) || {};
+  const d = openDialog(`<h3>${id ? 'Edit' : 'New'} product</h3>
+    <label>Name</label><input id="f_name" value="${esc(p.name)}">
+    <div class="row2"><div><label>SKU</label><input id="f_sku" value="${esc(p.sku)}"></div>
+    <div><label>Category</label><input id="f_cat" value="${esc(p.category)}"></div></div>
+    <div class="row2"><div><label>Price (₹)</label><input id="f_price" type="number" min="0" step="0.01" value="${esc(p.price)}"></div>
+    <div><label>Stock</label><input id="f_stock" type="number" min="0" step="1" value="${esc(p.stock ?? 0)}"></div></div>
+    <div class="foot"><button class="btn ghost" id="cx">Cancel</button><button class="btn" id="ok">Save</button></div>`);
+  $('#cx', d).onclick = closeDialog;
+  $('#ok', d).onclick = () => safe(async () => {
+    const body = {name: $('#f_name').value.trim(), sku: $('#f_sku').value.trim(), category: $('#f_cat').value.trim(),
+                  price: $('#f_price').value === '' ? null : Number($('#f_price').value), stock: parseInt($('#f_stock').value || '0', 10)};
+    await api(id ? '/products/' + id : '/products', {method: id ? 'PUT' : 'POST', body});
+    closeDialog(); toast('Product saved'); products();
+  });
+}
+function delProduct(id) {
+  if (!confirm('Delete this product?')) return;
+  safe(async () => { await api('/products/' + id, {method: 'DELETE'}); toast('Product deleted'); products(); });
+}
+
+/* ---------- orders ---------- */
+async function orders() {
+  const list = await api('/orders');
+  listPage('Orders', 'order',
+    [{h: '#'}, {h: 'Customer'}, {h: 'Date'}, {h: 'Items'}, {h: 'Total', num: 1}, {h: 'Status'}],
+    list.map(o => `<tr><td>${o.id}</td><td>${esc(o.customer.name)}</td><td>${fdate(o.orderDate)}</td>
+      <td><ul class="items">${o.items.map(i => `<li>${esc(i.product.name)} × ${i.quantity}</li>`).join('')}</ul></td>
+      <td class="num">${money(o.total)}</td><td><span class="tag ${o.status}">${o.status}</span></td>
+      <td class="act">${o.status === 'PLACED' ? `<button class="btn ghost sm" onclick="setStatus(${o.id},'DELIVERED')">Mark delivered</button>` : ''}
+      ${o.status !== 'CANCELLED' ? `<button class="btn danger sm" onclick="setStatus(${o.id},'CANCELLED')">Cancel</button>` : ''}</td></tr>`),
+    orderForm);
+  $('.bar #q').style.display = 'none';
+}
+function setStatus(id, status) {
+  if (status === 'CANCELLED' && !confirm('Cancel this order? Stock will be returned.')) return;
+  safe(async () => { await api('/orders/' + id + '/status', {method: 'PUT', body: {status}}); toast('Order updated'); orders(); });
+}
+async function orderForm() {
+  const [cs, ps] = await Promise.all([api('/customers'), api('/products')]);
+  if (!cs.length || !ps.length) return toast('Add at least one customer and one product first');
+  const prodOpts = ps.filter(p => p.stock > 0).map(p => `<option value="${p.id}" data-price="${p.price}">${esc(p.name)} — ${money(p.price)} (stock ${p.stock})</option>`).join('');
+  if (!prodOpts) return toast('All products are out of stock');
+  const d = openDialog(`<h3>New order</h3>
+    <label>Customer</label><select id="o_cust">${cs.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select>
+    <label>Items</label><div id="lines"></div>
+    <button class="btn ghost sm" id="addline" style="margin-top:8px">Add another item</button>
+    <div class="foot"><span class="tot" id="tot"></span><button class="btn ghost" id="cx">Cancel</button><button class="btn" id="ok">Place order</button></div>`);
+  const lines = $('#lines', d);
+  const total = () => {
+    let t = 0;
+    lines.querySelectorAll('.line').forEach(l => {
+      const o = $('select', l).selectedOptions[0];
+      t += Number(o.dataset.price) * (parseInt($('input', l).value, 10) || 0);
+    });
+    $('#tot', d).textContent = 'Total: ' + money(t);
+  };
+  const addLine = () => {
+    const div = document.createElement('div'); div.className = 'line';
+    div.innerHTML = `<select>${prodOpts}</select><input type="number" min="1" value="1" aria-label="Quantity">
+      <button class="btn danger sm" type="button" aria-label="Remove item">×</button>`;
+    div.querySelector('select').onchange = total; div.querySelector('input').oninput = total;
+    div.querySelector('button').onclick = () => { if (lines.children.length > 1) { div.remove(); total(); } };
+    lines.appendChild(div); total();
+  };
+  addLine();
+  $('#addline', d).onclick = addLine;
+  $('#cx', d).onclick = closeDialog;
+  $('#ok', d).onclick = () => safe(async () => {
+    const items = [...lines.querySelectorAll('.line')].map(l => ({productId: Number($('select', l).value), quantity: parseInt($('input', l).value, 10) || 0}));
+    await api('/orders', {method: 'POST', body: {customerId: Number($('#o_cust').value), items}});
+    closeDialog(); toast('Order placed'); orders();
+  });
+}
+
+render();
+</script>
+</body>
+</html>
